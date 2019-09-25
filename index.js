@@ -1,3 +1,4 @@
+'use strict';
 const store = {
   items: [
     { id: cuid(), name: 'apples', checked: false },
@@ -7,6 +8,42 @@ const store = {
   ],
   hideCheckedItems: false
 };
+
+/////////
+
+//on click side of name change
+const handleItemNameChange = function() {
+  //similar to handleItemCheckClick, now with rename ID
+  $('.js-shopping-list').on('click', '.shopping-item', event => {
+    const id = getItemIdFromElement(event.currentTarget);
+    //rename item
+    renameItem(id);
+    generateItemElement(id);
+    handleUpdateItemButton();
+  });
+};
+
+const handleUpdateItemButton = function() {
+  $('.js-shopping-list').submit(event => {
+    event.preventDefault();
+    const newItemName = $('.js-update-item').val();
+    $('.js-update-item').val('');
+    addItemToShoppingList(newItemName);
+    $('.js-shopping-list').off('submit');
+    store.items.splice(store.items.indexOf(store.update), 1);
+    store.update = false;
+    render();
+  });
+};
+
+const renameItem = function (id) {
+  console.log('renameItem ran');
+  const index = store.items.findIndex(item => item.id === id);
+  store.update = store.items[index];
+  render();
+};
+
+/////////////
 
 const generateItemElement = function (item) {
   let itemTitle = `<span class='shopping-item shopping-item__checked'>${item.name}</span>`;
@@ -158,6 +195,7 @@ const handleShoppingList = function () {
   render();
   handleNewItemSubmit();
   handleItemCheckClicked();
+  handleItemNameChange();
   handleDeleteItemClicked();
   handleToggleFilterClick();
 };
